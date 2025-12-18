@@ -2,16 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AR Human Talk</title>
+  <title>AR Human Talk with Mouth Animation</title>
 
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-
   <!-- AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
-
 <body style="margin:0; overflow:hidden;">
+
+  <!-- Товч дарахад дуу эхлүүлэх -->
+  <button id="playBtn" style="position: absolute; top: 20px; left: 20px; z-index: 999; padding:10px 20px;">
+    Яриулах
+  </button>
 
   <a-scene
     embedded
@@ -19,18 +22,30 @@
     vr-mode-ui="enabled:false">
 
     <!-- 3D ХҮН -->
-    <a-entity
-      gltf-model="human.glb"
-      position="0 0 -1.5"
-      rotation="0 180 0"
-      scale="1 1 1">
+    <a-entity id="human"
+              gltf-model="human.glb"
+              position="0 0.8 -1.5"
+              rotation="0 180 0"
+              scale="1.5 1.5 1.5"
+              look-at="[camera]">
 
-      <!-- ДУУ -->
-      <a-sound
-        src="voice.mp3"
-        autoplay="true"
-        loop="true">
+      <!-- MP3 дуу -->
+      <a-sound id="voice"
+               src="voice.mp3"
+               autoplay="false"
+               loop="false">
       </a-sound>
+
+      <!-- Амны хөдөлгөөн animation -->
+      <a-animation id="mouthAnim"
+                   attribute="scale"
+                   to="1.5 1.6 1.5"
+                   direction="alternate"
+                   dur="200"
+                   repeat="indefinite"
+                   easing="ease-in-out"
+                   begin="playMouth">
+      </a-animation>
 
     </a-entity>
 
@@ -38,6 +53,24 @@
     <a-camera position="0 1.6 0"></a-camera>
 
   </a-scene>
+
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const voice = document.querySelector('#voice');
+    const human = document.querySelector('#human');
+
+    playBtn.addEventListener('click', () => {
+      voice.components.sound.playSound();
+
+      // Амны animation эхлүүлэх
+      human.emit('playMouth');
+
+      // Дуу дууссаны дараа animation зогсоох
+      voice.components.sound.sound.onended = () => {
+        human.removeAttribute('animation'); // simplified зогсоох
+      };
+    });
+  </script>
 
 </body>
 </html>
